@@ -66,13 +66,29 @@ function App() {
         const newProgress = prev.map((p, i) => {
           if (p >= 100) return p;
           const speed = Math.random() * 2;
-          const newP = p + speed;
-          if (newP >= 100 && !finished.includes(i)) {
-            setFinished(f => [...f, i]);
-          }
-          return Math.min(newP, 100);
+          return Math.min(p + speed, 100);
         });
 
+        // Get newly finished horses, ensuring no duplicates
+        const newlyFinished = newProgress
+          .map((p, index) => ({ progress: p, index }))
+          .filter(({ progress, index }) => 
+            progress >= 100 && 
+            !finished.includes(index) &&
+            !finished.some(finishedIndex => finishedIndex === index)
+          )
+          .map(({ index }) => index);
+
+        // Update finished state if there are new finishers
+        if (newlyFinished.length > 0) {
+          setFinished(prev => {
+            // Create a Set to remove any potential duplicates
+            const uniqueFinished = Array.from(new Set([...prev, ...newlyFinished]));
+            return uniqueFinished.slice(0, horses.length);
+          });
+        }
+
+        // Check if race is complete
         if (newProgress.every(p => p >= 100)) {
           setIsRacing(false);
           setGameOver(true);
@@ -84,7 +100,7 @@ function App() {
     }, 50);
 
     return () => clearInterval(interval);
-  }, [isRacing, finished]);
+  }, [isRacing, finished, horses.length]);
 
   const startRace = (): void => {
     setIsRacing(true);
@@ -102,7 +118,7 @@ function App() {
 
   return (
     <div style={{ 
-      maxWidth: '600px', 
+      maxWidth: '1280px',
       margin: '2rem auto',
       padding: '1.5rem',
       backgroundColor: 'white',
@@ -143,7 +159,7 @@ function App() {
           marginBottom: '1rem'
         }}
       >
-        {isRacing ? 'Race in Progress...' : 'Start Race'}
+        {isRacing ? 'Race in Progress...' : gameOver ? 'Start Race' : 'Start Race'}
       </button>
 
       {gameOver && (
@@ -156,7 +172,7 @@ function App() {
             Race Results:
           </h3>
           {finished.map((horseIndex, rank) => (
-            <div key={horseIndex} style={{ fontSize: '1.125rem' }}>
+            <div key={`${horses[horseIndex].name}-${rank}`} style={{ fontSize: '1.125rem' }}>
               {rank + 1}{getRankSuffix(rank + 1)} Place: {horses[horseIndex].name}
             </div>
           ))}
