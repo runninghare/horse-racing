@@ -63,7 +63,7 @@ function App() {
 
     const interval = setInterval(() => {
       setProgress(prev => {
-        const newProgress = prev.map((p, i) => {
+        const newProgress = prev.map((p) => {
           if (p >= 100) return p;
           const speed = Math.random() * 2;
           return Math.min(p + speed, 100);
