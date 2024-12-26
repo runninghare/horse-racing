@@ -202,7 +202,7 @@ const SpinningWheel = () => {
         </div>
       </div>
 
-      <div ref={wheelRef as any} className="relative w-64 h-64">
+      <div ref={wheelRef as any} className="relative w-16 h-16">
         <svg className="w-full h-full" viewBox="0 0 100 100">
           <g transform={`rotate(${rotation} 50 50)`} style={{ transition: 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)' }}>
             {availableParticipants.map((participant, index) => (
