@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Trash2, RotateCcw, Play, Pause } from 'lucide-react';
 
-const Confetti = ({ isActive }: { isActive: boolean }) => {
+const Confetti = ({ isActive }) => {
   if (!isActive) return null;
   
   return (
@@ -39,7 +39,7 @@ const SpinningWheel = () => {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [newParticipant, setNewParticipant] = useState('');
-  const [selectedParticipant, setSelectedParticipant] = useState<string | null>(null);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
   
   // Timer states
@@ -48,8 +48,8 @@ const SpinningWheel = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [inputMinutes, setInputMinutes] = useState(5);
   
-  const wheelRef = useRef<SVGSVGElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const wheelRef = useRef(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     if (isRunning) {
@@ -60,12 +60,12 @@ const SpinningWheel = () => {
           setMinutes(minutes - 1);
           setSeconds(59);
         } else {
-          clearInterval(timerRef.current as NodeJS.Timeout);
+          clearInterval(timerRef.current);
           setIsRunning(false);
         }
       }, 1000);
     }
-    return () => clearInterval(timerRef.current as NodeJS.Timeout);
+    return () => clearInterval(timerRef.current);
   }, [isRunning, minutes, seconds]);
 
   // Modified confetti effect duration
@@ -92,7 +92,7 @@ const SpinningWheel = () => {
     setSeconds(0);
   };
 
-  const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMinutesChange = (e) => {
     const value = parseInt(e.target.value) || 0;
     setInputMinutes(value);
     if (!isRunning) {
@@ -101,7 +101,7 @@ const SpinningWheel = () => {
     }
   };
 
-  const togglePresence = (index: number) => {
+  const togglePresence = (index) => {
     const updatedParticipants = [...participants];
     updatedParticipants[index].present = !updatedParticipants[index].present;
     setParticipants(updatedParticipants);
@@ -114,7 +114,7 @@ const SpinningWheel = () => {
     }
   };
 
-  const removeParticipant = (index: number) => {
+  const removeParticipant = (index) => {
     const updatedParticipants = participants.filter((_, i) => i !== index);
     setParticipants(updatedParticipants);
   };
@@ -202,7 +202,7 @@ const SpinningWheel = () => {
         </div>
       </div>
 
-      <div ref={wheelRef as any} className="relative w-16 h-16">
+      <div ref={wheelRef} className="relative w-64 h-64">
         <svg className="w-full h-full" viewBox="0 0 100 100">
           <g transform={`rotate(${rotation} 50 50)`} style={{ transition: 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)' }}>
             {availableParticipants.map((participant, index) => (
