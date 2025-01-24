@@ -29,7 +29,7 @@ const Confetti = ({ isActive }) => {
 
 const SpinningWheel = () => {
   // ... [Previous state declarations remain the same until showConfetti]
-  const [participants, setParticipants] = useState(PARTICIPANTS);
+  const [participants, setParticipants] = useState(PARTICIPANTS as any);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [newParticipant, setNewParticipant] = useState('');
