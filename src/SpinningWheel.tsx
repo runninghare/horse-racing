@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Trash2, RotateCcw, Play, Pause } from 'lucide-react';
+import { PARTICIPANTS } from './constants/participants.constant'
 
 const Confetti = ({ isActive }) => {
   if (!isActive) return null;
@@ -28,14 +29,7 @@ const Confetti = ({ isActive }) => {
 
 const SpinningWheel = () => {
   // ... [Previous state declarations remain the same until showConfetti]
-  const [participants, setParticipants] = useState([
-    { name: 'Frank', present: true, selected: false },
-    { name: 'Ross', present: true, selected: false },
-    { name: 'Amy', present: true, selected: false },
-    { name: 'Sumit', present: true, selected: false },
-    { name: 'Ben', present: true, selected: false },
-    { name: 'Vicky', present: true, selected: false }
-  ]);
+  const [participants, setParticipants] = useState(PARTICIPANTS);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [newParticipant, setNewParticipant] = useState('');

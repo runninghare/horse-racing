@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './HorseRacing.css'
+import { PARTICIPANTS } from './constants/participants.constant'
 
 interface Horse {
   name: string;
@@ -46,12 +47,7 @@ const Horse = ({ name, color, progress, finished }: HorseProps) => (
 );
 
 function HorseRacing() {
-  const horses: Horse[] = [
-    { name: 'Amy', color: '#F59E0B' },     // Yellow
-    { name: 'Elmer', color: '#10B981' },  // Green
-    { name: 'Frank', color: '#EF4444' },  // Red
-    { name: 'Ross', color: '#3B82F6' },   // Blue
-  ];
+  const horses: Horse[] = PARTICIPANTS;
 
   const [isRacing, setIsRacing] = useState<boolean>(false);
   const [progress, setProgress] = useState<number[]>(horses.map(() => 0));
