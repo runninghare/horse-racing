@@ -1,4 +1,5 @@
 
+// Update this list to add new users
 export const PARTICIPANTS = [
     { name: 'Frank', present: true, selected: false, color: '#EF4444' },
     { name: 'Ross', present: true, selected: false, color: '#3B82F6' },
