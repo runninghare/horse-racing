@@ -7,4 +7,5 @@ export const PARTICIPANTS = [
     { name: 'Sumit', present: true, selected: false, color: '#10B981' },
     { name: 'Elmer', present: true, selected: false, color: '#F43F5E' },
     { name: 'Vicky', present: true, selected: false, color: '#0EA5E9' },
+    { name: 'Ben', present: true, selected: false, color: '#E70F96' },
 ]
