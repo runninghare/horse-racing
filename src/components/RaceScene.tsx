@@ -662,6 +662,64 @@ function Dust({ active, phase }: { active: boolean; phase: number }) {
   );
 }
 
+/** Lift overlapping nameplates above the pack without moving their horse anchors. */
+function HorseLabelLayout() {
+  const { gl } = useThree();
+  useFrame(() => {
+    // Drei portals labels beside the canvas's inner resize container.
+    const labels =
+      gl.domElement.parentElement?.parentElement?.querySelectorAll<HTMLElement>(
+        ".horse-name-label",
+      );
+    if (!labels) return;
+    // Read every rectangle before writing styles to avoid layout thrashing.
+    const boxes = Array.from(labels, (element) => {
+      const rect = element.getBoundingClientRect();
+      const lift =
+        parseFloat(element.style.getPropertyValue("--horse-label-lift")) || 0;
+      return {
+        element,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top + lift,
+        bottom: rect.bottom + lift,
+        height: rect.height,
+        lift,
+      };
+    })
+      .filter((box) => box.height > 0)
+      .sort((a, b) => b.bottom - a.bottom);
+    const placed: typeof boxes = [];
+    for (const box of boxes) {
+      const anchorTop = box.top;
+      let collision = placed.find(
+        (other) =>
+          box.left < other.right + 3 &&
+          box.right + 3 > other.left &&
+          box.top < other.bottom + 3 &&
+          box.bottom + 3 > other.top,
+      );
+      while (collision) {
+        box.bottom = collision.top - 3;
+        box.top = box.bottom - box.height;
+        collision = placed.find(
+          (other) =>
+            box.left < other.right + 3 &&
+            box.right + 3 > other.left &&
+            box.top < other.bottom + 3 &&
+            box.bottom + 3 > other.top,
+        );
+      }
+      const lift = anchorTop - box.top;
+      if (Math.abs(lift - box.lift) > 0.1) {
+        box.element.style.setProperty("--horse-label-lift", `${lift}px`);
+      }
+      placed.push(box);
+    }
+  });
+  return null;
+}
+
 function Runner({
   runner,
   count,
@@ -697,55 +755,68 @@ function Runner({
       </group>
       <Dust active={moving && !reducedMotion} phase={runner.phase} />
       {selected && (
-        <>
-          <mesh
-            rotation={[-Math.PI / 2, 0, 0]}
-            position={[0, 0.025, 0]}
-            scale={[1.55, 0.69, 1]}
-          >
-            <ringGeometry args={[0.88, 1, 48]} />
-            <meshBasicMaterial
-              color={participant.color}
-              transparent
-              opacity={0.85}
-              depthWrite={false}
-            />
-          </mesh>
-          <Html
-            position={[0, 3.1, 0]}
-            center
-            zIndexRange={[20, 0]}
-            style={{ pointerEvents: "none" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "5px 9px",
-                borderRadius: 20,
-                background: "rgba(255, 251, 240, .95)",
-                color: "#283c35",
-                whiteSpace: "nowrap",
-                font: "600 10px/1.1 system-ui, sans-serif",
-                boxShadow: "0 2px 10px #233a2820",
-                border: "1px solid rgba(255,255,255,.8)",
-                pointerEvents: "none",
-              }}
-            >
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: participant.color,
-                }}
-              />
-              {participant.name}
-            </div>
-          </Html>
-        </>
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0.025, 0]}
+          scale={[1.55, 0.69, 1]}
+        >
+          <ringGeometry args={[0.88, 1, 48]} />
+          <meshBasicMaterial
+            color={participant.color}
+            transparent
+            opacity={0.85}
+            depthWrite={false}
+          />
+        </mesh>
       )}
+      <Html
+        position={[0, 3.1, 0]}
+        center
+        zIndexRange={[20, 0]}
+        style={{ pointerEvents: "none" }}
+      >
+        <div
+          className="horse-name-label"
+          style={{
+            position: "relative",
+            transform: "translateY(calc(-1 * var(--horse-label-lift, 0px)))",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "5px 9px",
+            borderRadius: 20,
+            background: "rgba(255, 251, 240, .95)",
+            color: "#283c35",
+            whiteSpace: "nowrap",
+            font: "600 10px/1.1 system-ui, sans-serif",
+            boxShadow: "0 2px 10px #233a2820",
+            border: "1px solid rgba(255,255,255,.8)",
+            pointerEvents: "none",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "100%",
+              width: 1,
+              height: "var(--horse-label-lift, 0px)",
+              background: participant.color,
+              opacity: 0.4,
+            }}
+          />
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: participant.color,
+            }}
+          />
+          {participant.name}
+        </div>
+      </Html>
     </group>
   );
 }
@@ -916,6 +987,7 @@ function World(props: RaceSceneProps) {
         selected={props.selected}
         reducedMotion={props.reducedMotion}
       />
+      <HorseLabelLayout />
     </>
   );
 }
