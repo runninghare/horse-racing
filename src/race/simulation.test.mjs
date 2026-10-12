@@ -5,6 +5,7 @@ import {
   coursePoint,
   createRace,
   rankRunners,
+  RACE_SPEEDS,
   startRace,
 } from "./simulation.ts";
 
@@ -28,12 +29,82 @@ function freeze(state) {
   return Object.freeze(state);
 }
 
-function atTime(initial, seconds, fps) {
+function atTime(initial, seconds, fps, playbackRate = 1) {
   let state = initial;
   const frames = Math.floor(seconds * fps);
-  for (let i = 0; i < frames; i++) state = advanceRace(state, 1 / fps);
-  return advanceRace(state, seconds - frames / fps);
+  for (let i = 0; i < frames; i++)
+    state = advanceRace(state, 1 / fps, playbackRate);
+  return advanceRace(state, seconds - frames / fps, playbackRate);
 }
+
+test("playback speed preserves the countdown and scales only racing carryover", () => {
+  const initial = freeze(startRace(createRace(8, seededRandom())));
+  for (const rate of RACE_SPEEDS) {
+    const waiting = freeze(advanceRace(initial, 2.75, rate));
+    assert.equal(waiting.countdown, 0.25);
+    assert.equal(waiting.elapsed, 0);
+    assert.ok(waiting.runners.every((runner) => runner.progress === 0));
+    assert.equal(advanceRace(waiting, 0.25, rate).elapsed, 0);
+    assert.deepEqual(
+      advanceRace(waiting, 0.75, rate),
+      advanceRace(initial, 3 + 0.5 * rate),
+    );
+  }
+  assert.deepEqual(advanceRace(initial, 12), advanceRace(initial, 12, 1));
+});
+
+test("live speed changes preserve progress, pause state and runner profiles", () => {
+  const initial = freeze(startRace(createRace(8, seededRandom())));
+  const running = freeze(advanceRace(initial, 5));
+  const slow = freeze(advanceRace(running, 0.4, 0.5));
+  close(slow.elapsed, 2.2);
+  const paused = freeze({ ...slow, status: "paused" });
+  for (const rate of RACE_SPEEDS)
+    assert.equal(advanceRace(paused, 100, rate), paused);
+  const resumed = advanceRace({ ...paused, status: "racing" }, 0.7, 2);
+  const fast = advanceRace(resumed, 0.1, 4);
+  close(fast.elapsed, 4);
+  const expected = advanceRace(initial, 7);
+  fast.runners.forEach((runner, index) => {
+    close(runner.progress, expected.runners[index].progress);
+    assert.equal(runner.speed, running.runners[index].speed);
+    assert.equal(runner.phase, running.runners[index].phase);
+  });
+  assert.equal(running.elapsed, 2);
+});
+
+test("all playback speeds retain frame-independent progress and exact finish order", () => {
+  const initial = freeze(startRace(createRace(8, seededRandom())));
+  for (const rate of RACE_SPEEDS) {
+    for (const raceSeconds of [10, 36.25, 43]) {
+      const expected = advanceRace(initial, 3 + raceSeconds);
+      for (const fps of [24, 60, 144]) {
+        const actual = atTime(initial, 3 + raceSeconds / rate, fps, rate);
+        assert.equal(actual.status, expected.status);
+        close(actual.elapsed, expected.elapsed, 1e-8);
+        actual.runners.forEach((runner, index) => {
+          close(runner.progress, expected.runners[index].progress, 1e-9);
+          assert.equal(runner.finishTime, expected.runners[index].finishTime);
+        });
+        assert.deepEqual(
+          rankRunners(actual).map((r) => r.id),
+          rankRunners(expected).map((r) => r.id),
+        );
+        if (actual.status === "finished")
+          assert.equal(advanceRace(actual, 10, rate), actual);
+      }
+    }
+  }
+});
+
+test("invalid playback rates are safe no-ops", () => {
+  const initial = freeze(startRace(createRace(8, seededRandom())));
+  const running = freeze(advanceRace(initial, 5));
+  for (const rate of [0, -1, -Infinity, Infinity, NaN]) {
+    assert.equal(advanceRace(initial, 5, rate), initial);
+    assert.equal(advanceRace(running, 5, rate), running);
+  }
+});
 
 test("creation is ready, reproducible, and samples randomness only at creation", () => {
   let calls = 0;

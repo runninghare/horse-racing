@@ -36,6 +36,7 @@ export interface RaceSceneProps {
   selected: number;
   participants: { name: string; color: string }[];
   reducedMotion: boolean;
+  playbackRate: number;
 }
 
 type Theme = typeof THEMES.meadow;
@@ -622,7 +623,15 @@ const Racecourse = memo(function Racecourse({
   );
 });
 
-function Dust({ active, phase }: { active: boolean; phase: number }) {
+function Dust({
+  active,
+  phase,
+  playbackRate,
+}: {
+  active: boolean;
+  phase: number;
+  playbackRate: number;
+}) {
   const geometry = useMemo(() => {
     const result = new BufferGeometry();
     result.setAttribute(
@@ -635,7 +644,7 @@ function Dust({ active, phase }: { active: boolean; phase: number }) {
   useEffect(() => () => geometry.dispose(), [geometry]);
   useFrame((_, delta) => {
     if (!active) return;
-    time.current += Math.min(delta, 0.1);
+    time.current += Math.min(delta, 0.1) * playbackRate;
     const position = geometry.getAttribute("position");
     for (let i = 0; i < position.count; i++) {
       const age = (time.current * 0.85 + i / position.count) % 1;
@@ -727,6 +736,7 @@ function Runner({
   participant,
   selected,
   reducedMotion,
+  playbackRate,
 }: {
   runner: RaceState["runners"][number];
   count: number;
@@ -734,6 +744,7 @@ function Runner({
   participant: RaceSceneProps["participants"][number];
   selected: boolean;
   reducedMotion: boolean;
+  playbackRate: number;
 }) {
   const point = coursePoint(Math.min(runner.progress, 1), runner.id, count);
   const moving =
@@ -751,9 +762,14 @@ function Runner({
           silk={participant.color}
           running={moving && !reducedMotion}
           phase={runner.phase}
+          playbackRate={playbackRate}
         />
       </group>
-      <Dust active={moving && !reducedMotion} phase={runner.phase} />
+      <Dust
+        active={moving && !reducedMotion}
+        phase={runner.phase}
+        playbackRate={playbackRate}
+      />
       {selected && (
         <mesh
           rotation={[-Math.PI / 2, 0, 0]}
@@ -978,6 +994,7 @@ function World(props: RaceSceneProps) {
             }
             selected={runner.id === props.selected}
             reducedMotion={props.reducedMotion}
+            playbackRate={props.playbackRate}
           />
         ))}
       </Suspense>

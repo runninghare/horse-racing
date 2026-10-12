@@ -7,7 +7,7 @@ export type RaceStatus =
 
 export interface RaceState {
   status: RaceStatus;
-  /** Race time in seconds, excluding the countdown. */
+  /** Simulated race time in seconds, excluding the countdown. */
   elapsed: number;
   countdown: number;
   runners: {
@@ -21,6 +21,8 @@ export interface RaceState {
 }
 
 type Runner = RaceState["runners"][number];
+
+export const RACE_SPEEDS = [0.5, 1, 1.5, 2, 4] as const;
 
 const TAU = Math.PI * 2;
 const SPEED_VARIATION = 0.12;
@@ -64,10 +66,17 @@ export function startRace(state: RaceState): RaceState {
   };
 }
 
-export function advanceRace(state: RaceState, dt: number): RaceState {
+/** dt is wall time; playback changes race time only, never the countdown or results. */
+export function advanceRace(
+  state: RaceState,
+  dt: number,
+  playbackRate = 1,
+): RaceState {
   if (
     !Number.isFinite(dt) ||
     dt <= 0 ||
+    !Number.isFinite(playbackRate) ||
+    playbackRate <= 0 ||
     (state.status !== "countdown" && state.status !== "racing")
   ) {
     return state;
@@ -80,6 +89,7 @@ export function advanceRace(state: RaceState, dt: number): RaceState {
     }
     raceDt -= state.countdown;
   }
+  raceDt *= playbackRate;
 
   // Each profile completes one full sinusoidal speed cycle per lap. Its
   // integral is exactly one at 1 / speed, so no frame interpolation or

@@ -29,6 +29,7 @@ import {
   advanceRace,
   createRace,
   rankRunners,
+  RACE_SPEEDS,
   startRace,
   type RaceStatus,
 } from "./race/simulation";
@@ -97,6 +98,7 @@ export default function HorseRacing() {
   const [course, setCourse] = useState<Course>("meadow");
   const [cameraMode, setCameraMode] = useState<CameraMode>("broadcast");
   const [selected, setSelected] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const [reducedMotion, setReducedMotion] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
@@ -125,7 +127,7 @@ export default function HorseRacing() {
     const tick = (now: number) => {
       const delta = Math.min((now - last) / 1000, 0.1);
       last = now;
-      setRace((state) => advanceRace(state, delta));
+      setRace((state) => advanceRace(state, delta, playbackRate));
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
@@ -140,7 +142,7 @@ export default function HorseRacing() {
       cancelAnimationFrame(frame);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [running, race.status]);
+  }, [running, race.status, playbackRate]);
 
   const toggleRace = () => {
     if (running) {
@@ -194,6 +196,7 @@ export default function HorseRacing() {
                   selected={selected}
                   participants={PARTICIPANTS}
                   reducedMotion={reducedMotion}
+                  playbackRate={playbackRate}
                 />
               </Suspense>
             </SceneBoundary>
@@ -259,7 +262,10 @@ export default function HorseRacing() {
             </div>
           </div>
           <div className="race-controls">
-            <div className="race-clock">
+            <div
+              className="race-clock"
+              title="Simulated race time, independent of playback speed"
+            >
               <span className="eyebrow">RACE TIME</span>
               <strong>{formatTime(race.elapsed)}</strong>
             </div>
@@ -280,6 +286,23 @@ export default function HorseRacing() {
                 <span style={{ width: `${leaderProgress * 100}%` }} />
               </div>
             </div>
+            <label className="race-speed">
+              <span className="eyebrow">SPEED</span>
+              <select
+                aria-label="Race speed"
+                title="Change playback speed without changing the result"
+                value={playbackRate}
+                onChange={(event) =>
+                  setPlaybackRate(Number(event.target.value))
+                }
+              >
+                {RACE_SPEEDS.map((speed) => (
+                  <option key={speed} value={speed}>
+                    {speed}×
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               className="reset-race"
               onClick={() => setRace(createRace(PARTICIPANTS.length))}

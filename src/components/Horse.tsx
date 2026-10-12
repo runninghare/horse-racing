@@ -15,10 +15,17 @@ export interface HorseProps {
   running: boolean;
   /** Phase offset in radians, matching the simulation's runner phase. */
   phase: number;
+  playbackRate?: number;
 }
 
 /** The GLB uses rigid animated nodes, so Object3D.clone preserves its entire rig. */
-export function Horse({ silk, coat, running, phase }: HorseProps) {
+export function Horse({
+  silk,
+  coat,
+  running,
+  phase,
+  playbackRate = 1,
+}: HorseProps) {
   const { scene, animations } = useGLTF("/models/horse.glb");
   const instance = useMemo(() => {
     const root = scene.clone(true);
@@ -73,7 +80,7 @@ export function Horse({ silk, coat, running, phase }: HorseProps) {
   );
 
   useFrame((_, delta) => {
-    if (running) instance.mixer.update(Math.min(delta, 0.1));
+    if (running) instance.mixer.update(Math.min(delta, 0.1) * playbackRate);
   });
 
   return <primitive object={instance.root} dispose={null} />;
