@@ -1,0 +1,17 @@
+# Findings
+- Wheel enhancement: original SVG uses a rotating pointer, shrinks slices at winner reveal, identifies people by name, and allows roster mutation mid-spin. Replace with a stationary pointer, immutable spin snapshot and stable IDs.
+- Existing wheel timer uses chained interval state; replacement should calculate remaining time from a deadline and clean up all callbacks on unmount.
+- New wheel uses Web Crypto samples, stable participant IDs, frozen visual snapshots, a fixed pointer, and 5.4-second quartic deceleration. Sound is synthesized locally and opt-in.
+- First desktop visual check: brass wheel, readable sector labels, cream/forest guest list, winner panel and timer/history layout match the existing Racing Club design.
+- Correctness audit caught that performance.now may pause during system sleep on macOS. TurnTimer now uses a wall-clock deadline for sleep/background reconciliation; wheel animation still correctly uses RAF time.
+- Browser checks confirm a winner under the pointer, locked roster during spins, unique no-repeat picks, session restoration, countdown pause/resume/completion, single-guest full-circle behavior, and zero-eligible disabled state. Mobile is 390px wide with no overflow.
+- React 18 / Vite / TypeScript app, initially without Three.js dependencies.
+- `src/constants/participants.constant.ts` has existing user changes: do not overwrite.
+- Blender CLI is installed; Blender executable needs locating.
+- Existing race uses progress bars; replace with custom low-poly equestrian diorama and race controls.
+- Horse visually verified: sculptural faceted model with jockey, 5,402 triangles, 422 KB, seamless 0.8-second Gallop clip; +X forward, Y-up.
+- Three themed dioramas share capsule geometry and normalized lap progress. Exact integrated speed curves avoid frame-dependent winners.
+- Desktop browser confirms the scene, eight distinct silks, live ranking, pause stability (00:04.1), selected-runner change and locked course controls while racing.
+- Fonts are self-hosted with SIL licenses; runtime assets do not depend on third-party networks.
+- Final full race completed with all eight finishers in exact time order. Mobile at 390px has no overflow; all course themes and both games render.
+- Production preview independently confirms GLB/font HTTP 200, no external requests, and no captured runtime errors.

@@ -1,0 +1,14 @@
+# Progress
+- Started requested wheel enhancement; inspected current wheel, shared shell, styles and working tree. Existing race changes and participant edit will be preserved.
+- Implemented WheelDisc, optional synthesized sound, immutable draw/session helpers, session-storage persistence, new wheel UI and dedicated TurnTimer. Initial build/lint pass; 64 tests pass before extra Date-range validation case.
+- Visually checked desktop wheel and winner, plus 390px mobile. Verified timer completion at 00:00 with Replay, single/empty states, and no runtime errors. Fixed sleep-aware timer deadline after independent correctness audit.
+- Wheel finished: 65 combined cases pass; final build, lint (zero warnings), app typecheck and standard whitespace checks pass. Reduced-motion/repeat draws, simulated sleep, navigation cancellation and production pointer/timer behavior verified. Production resources are entirely local. Browser QA space closed; updated README and saved wheel screenshots/verification notes.
+- Read Blender pipeline, frontend design, planning, and browser skills.
+- Inspected original app and git status.
+- Built Blender model/source/previews, typed Horse and RaceScene components, simulation, UI, and responsive styles.
+- First build and scoped ESLint pass. All 10 simulation tests pass.
+- Desktop browser preview inspected; countdown, progress, pause and follow selection work.
+- Final build, full-project ESLint, typecheck and 10 tests pass; GLB checks confirm selected meshes only and seamless animation.
+- Inspected desktop, close follow, sunset and mobile alpine screenshots. Verified full race completion, pause/resume during countdown, reset and original wheel navigation.
+- Production preview checked successfully. Browser QA space closed; development server remains on port 5173.
+- Documented reproduction, usage and validation in README, Blender README and docs/verification.md. User participant edit remains untouched.
