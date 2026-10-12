@@ -1,0 +1,8 @@
+{
+  "recipe": "quick",
+  "frame": 1,
+  "_bundle_dir": "/Users/rossz/workspace/cloudflare/smart-accountant/labs/horse-racing/blender/previews",
+  "hero": "/Users/rossz/workspace/cloudflare/smart-accountant/labs/horse-racing/blender/previews/hero.png",
+  "workbench": "/Users/rossz/workspace/cloudflare/smart-accountant/labs/horse-racing/blender/previews/workbench.png",
+  "compatibility_note": "Local preview extension for installed CLI 1.0; real Blender renders."
+}

@@ -1,0 +1,70 @@
+{
+  "file": "public/models/horse.glb",
+  "bytes": 422360,
+  "meshCount": 81,
+  "nodeCount": 100,
+  "triangleCount": 5402,
+  "animations": [
+    {
+      "name": "Gallop",
+      "duration": 0.800000011920929,
+      "tracks": 20,
+      "seamError": 3.918869895185313e-18
+    }
+  ],
+  "orientation": "+X forward, +Y up",
+  "defaultBounds": {
+    "min": [
+      -1.4600165258740256,
+      -4.4611764893343064e-8,
+      -0.4128616154193878
+    ],
+    "max": [
+      1.512730363013312,
+      2.417425504079547,
+      0.4128616154193878
+    ],
+    "size": [
+      2.972746888887338,
+      2.417425548691312,
+      0.8257232308387756
+    ]
+  },
+  "sampledAnimationBounds": {
+    "min": [
+      -1.708303685548499,
+      -0.0003665534699484607,
+      -0.4128616154193878
+    ],
+    "max": [
+      1.526232767912631,
+      2.5856994365485795,
+      0.4128616154193878
+    ]
+  },
+  "minimumGroundClearance": -0.0003665534699484607,
+  "maximumGroundClearance": 0.08977883548944238,
+  "materials": [
+    "SilkTrim",
+    "HorseCoat",
+    "Hooves",
+    "Ivory",
+    "Leather",
+    "Brass",
+    "EarInner",
+    "Eyes",
+    "BootsGloves",
+    "Goggles",
+    "JockeySilk",
+    "Skin",
+    "Breeches",
+    "ManeTail"
+  ],
+  "checks": {
+    "selectedDeliverablesOnly": true,
+    "noCameras": true,
+    "noLights": true,
+    "loopSeam": true,
+    "loadsInThree": true
+  }
+}
