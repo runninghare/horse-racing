@@ -1,283 +1,643 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Trash2, RotateCcw, Play, Pause } from 'lucide-react';
-import { PARTICIPANTS } from './constants/participants.constant'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+} from "react";
+import {
+  ArrowRight,
+  Check,
+  ChevronRight,
+  CircleHelp,
+  Clock3,
+  History,
+  Plus,
+  RotateCcw,
+  Sparkles,
+  Trash2,
+  Users,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { PARTICIPANTS } from "./constants/participants.constant";
+import { WheelDisc, type WheelSpin } from "./components/WheelDisc";
+import { TurnTimer } from "./components/TurnTimer";
+import {
+  createSession,
+  eligibleEntries,
+  finishDraw,
+  MAX_ENTRIES,
+  planSpin,
+  resetRound,
+  restoreSession,
+  type WheelSession,
+} from "./wheel/model";
+import { useWheelSound } from "./wheel/useWheelSound";
+import "./SpinningWheel.css";
 
-const Confetti = ({ isActive }) => {
-  if (!isActive) return null;
-  
-  return (
-    <div className="fixed inset-0 pointer-events-none">
-      {[...Array(50)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute animate-confetti"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: '-10px',
-            backgroundColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
-            width: '10px',
-            height: '10px',
-            transform: `rotate(${Math.random() * 360}deg)`,
-            animationDelay: `${Math.random() * 0.5}s`, // Reduced delay for quicker start
-            animationDuration: `${2 + Math.random()}s` // Faster fall
-          }}
-        />
-      ))}
-    </div>
+const STORAGE_KEY = "racing-club:wheel:v1";
+const COLORS = [
+  "#547562",
+  "#d8dcb6",
+  "#dfba7b",
+  "#ece3cc",
+  "#94b6a4",
+  "#c9dccb",
+  "#c89072",
+  "#a6b49b",
+];
+
+function initialSession(): WheelSession {
+  const fallback = createSession(
+    PARTICIPANTS.slice(0, MAX_ENTRIES).map((entry, index) => ({
+      ...entry,
+      color: COLORS[index % COLORS.length],
+    })),
   );
-};
+  try {
+    return restoreSession(sessionStorage.getItem(STORAGE_KEY), fallback);
+  } catch {
+    return fallback;
+  }
+}
 
-const SpinningWheel = () => {
-  // ... [Previous state declarations remain the same until showConfetti]
-  const [participants, setParticipants] = useState(PARTICIPANTS as any);
-  const [rotation, setRotation] = useState(0);
-  const [spinning, setSpinning] = useState(false);
-  const [newParticipant, setNewParticipant] = useState('');
-  const [selectedParticipant, setSelectedParticipant] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
-  
-  // Timer states
-  const [minutes, setMinutes] = useState(5);
-  const [seconds, setSeconds] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [inputMinutes, setInputMinutes] = useState(5);
-  
-  const wheelRef = useRef(null);
-  const timerRef = useRef(null);
+function randomSample() {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000;
+}
+
+export default function SpinningWheel() {
+  const [session, setSession] = useState(initialSession);
+  const [spin, setSpin] = useState<WheelSpin | null>(null);
+  const [phase, setPhase] = useState<"idle" | "spinning" | "revealed">("idle");
+  const [name, setName] = useState("");
+  const [formError, setFormError] = useState("");
+  const [soundOn, setSoundOn] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const [canSave, setCanSave] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(
+    () => matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const pending = useRef<WheelSpin | null>(null);
+  const { unlock, tick, celebrate } = useWheelSound(soundOn);
+  const spinning = phase === "spinning";
+  const available = eligibleEntries(session.participants, session.noRepeat);
+  const presentCount = session.participants.filter(
+    (entry) => entry.present,
+  ).length;
+  const lastDraw = session.history[session.history.length - 1];
+  const roundComplete = presentCount > 0 && available.length === 0;
+  const displayedEntries = spin?.entries ?? available;
 
   useEffect(() => {
-    if (isRunning) {
-      timerRef.current = setInterval(() => {
-        if (seconds > 0) {
-          setSeconds(seconds - 1);
-        } else if (minutes > 0) {
-          setMinutes(minutes - 1);
-          setSeconds(59);
-        } else {
-          clearInterval(timerRef.current);
-          setIsRunning(false);
-        }
-      }, 1000);
+    try {
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ version: 1, session }),
+      );
+      setCanSave(true);
+    } catch {
+      setCanSave(false);
     }
-    return () => clearInterval(timerRef.current);
-  }, [isRunning, minutes, seconds]);
+  }, [session]);
 
-  // Modified confetti effect duration
   useEffect(() => {
-    if (showConfetti) {
-      const timer = setTimeout(() => {
-        setShowConfetti(false);
-      }, 3000); // Reduced to 3 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [showConfetti]);
+    const query = matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(query.matches);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
 
-  const startTimer = () => {
-    setIsRunning(true);
-  };
+  useEffect(() => {
+    if (!celebrating) return;
+    const timeout = setTimeout(() => setCelebrating(false), 3200);
+    return () => clearTimeout(timeout);
+  }, [celebrating]);
 
-  const stopTimer = () => {
-    setIsRunning(false);
-  };
-
-  const resetTimer = () => {
-    setIsRunning(false);
-    setMinutes(inputMinutes);
-    setSeconds(0);
-  };
-
-  const handleMinutesChange = (e) => {
-    const value = parseInt(e.target.value) || 0;
-    setInputMinutes(value);
-    if (!isRunning) {
-      setMinutes(value);
-      setSeconds(0);
-    }
-  };
-
-  const togglePresence = (index) => {
-    const updatedParticipants = [...participants];
-    updatedParticipants[index].present = !updatedParticipants[index].present;
-    setParticipants(updatedParticipants);
-  };
-
-  const addParticipant = () => {
-    if (newParticipant.trim() !== '') {
-      setParticipants([...participants, { name: newParticipant, present: true, selected: false }]);
-      setNewParticipant('');
-    }
-  };
-
-  const removeParticipant = (index) => {
-    const updatedParticipants = participants.filter((_, i) => i !== index);
-    setParticipants(updatedParticipants);
-  };
+  const onComplete = useCallback(
+    (id: string) => {
+      const result = pending.current;
+      if (!result || result.id !== id) return;
+      pending.current = null;
+      const winner = result.entries[result.winnerIndex];
+      const now = Date.now();
+      setSession((current) => finishDraw(current, winner.id, id, now));
+      setPhase("revealed");
+      setCelebrating(true);
+      celebrate();
+    },
+    [celebrate],
+  );
 
   const spinWheel = () => {
-    const availableParticipants = participants.filter(p => p.present && !p.selected);
-    if (availableParticipants.length > 0) {
-      setSpinning(true);
-      startTimer();
-      const randomRotation = Math.floor(Math.random() * 360) + 720;
-      const totalRotation = rotation + randomRotation;
-      setRotation(totalRotation);
-      
-      setTimeout(() => {
-        setSpinning(false);
-        const sliceAngle = 360 / availableParticipants.length;
-        const selectedIndex = Math.floor(((360 - (totalRotation % 360)) % 360) / sliceAngle);
-        const selected = availableParticipants[selectedIndex].name;
-        
-        setSelectedParticipant(selected);
-        setParticipants(participants.map(p => 
-          p.name === selected ? { ...p, selected: true } : p
-        ));
-        
-        // Trigger confetti for every selection
-        setShowConfetti(true);
-      }, 5000);
-    } else {
-      alert("All participants have been selected. Please reset the selections to continue.");
+    if (pending.current || spinning) return;
+    const plan = planSpin(available, randomSample);
+    if (!plan) return;
+    const nextSpin = {
+      ...plan,
+      id: crypto.randomUUID(),
+      entries: available.map((entry) => ({ ...entry })),
+    };
+    pending.current = nextSpin;
+    if (soundOn) unlock();
+    setCelebrating(false);
+    setSpin(nextSpin);
+    setPhase("spinning");
+  };
+
+  const clearDisplay = () => {
+    setSpin(null);
+    setPhase("idle");
+    setCelebrating(false);
+    setFormError("");
+  };
+
+  const newRound = () => {
+    if (pending.current) return;
+    clearDisplay();
+    setSession((current) => resetRound(current));
+  };
+
+  const addGuest = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (pending.current) return;
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setFormError("A name would be lovely.");
+      return;
     }
+    if (session.participants.length >= MAX_ENTRIES) {
+      setFormError(`The wheel seats up to ${MAX_ENTRIES} guests.`);
+      return;
+    }
+    if (
+      session.participants.some(
+        (entry) =>
+          entry.name.toLocaleLowerCase() === trimmed.toLocaleLowerCase(),
+      )
+    ) {
+      setFormError("That name is already on the list. Try a nickname.");
+      return;
+    }
+    const entry = {
+      id: crypto.randomUUID(),
+      name: trimmed,
+      color: COLORS[session.participants.length % COLORS.length],
+      present: true,
+      selected: false,
+    };
+    clearDisplay();
+    setSession((current) => ({
+      ...current,
+      participants: [...current.participants, entry],
+    }));
+    setName("");
   };
 
-  const resetSelections = () => {
-    setSelectedParticipant(null);
-    setRotation(0);
-    setParticipants(participants.map(p => ({ ...p, selected: false })));
+  const setPresence = (id: string, present: boolean) => {
+    if (pending.current) return;
+    clearDisplay();
+    setSession((current) => ({
+      ...current,
+      participants: current.participants.map((entry) =>
+        entry.id === id ? { ...entry, present } : entry,
+      ),
+    }));
   };
-
-  const availableParticipants = participants.filter(p => p.present && !p.selected);
-  const sliceAngle = 360 / availableParticipants.length;
 
   return (
-    <div className="flex flex-col items-center space-y-4 p-4">
-      <style>{`
-        @keyframes confetti-fall {
-          0% { transform: translateY(0) rotate(0deg); }
-          100% { transform: translateY(100vh) rotate(360deg); }
-        }
-        
-        .animate-confetti {
-          animation: confetti-fall 3s linear forwards;
-        }
-      `}</style>
-      
-      <Confetti isActive={showConfetti} />
+    <main className="wheel-app">
+      <section className="wheel-heading">
+        <div>
+          <p className="wheel-eyebrow">
+            <span /> LEAVE A LITTLE ROOM FOR LUCK.
+          </p>
+          <h1>
+            A little spin of <em>fate.</em>
+          </h1>
+          <p>
+            Good company. Equal chances. A delightful way to decide who’s next.
+          </p>
+        </div>
+        <div className="wheel-meeting">
+          <Sparkles size={20} strokeWidth={1.4} />
+          <span>
+            THE LUCKY DRAW<strong>No favorites. Just a fair spin.</strong>
+          </span>
+        </div>
+      </section>
 
-      {/* Rest of the component remains the same */}
-      <div className="flex items-center space-x-4 mb-4">
-        <div className="flex items-center space-x-2">
-          <input
-            type="number"
-            min="0"
-            value={inputMinutes}
-            onChange={handleMinutesChange}
-            className="w-16 px-2 py-1 border rounded"
-          />
-          <span className="text-lg">min</span>
-        </div>
-        <div className="text-2xl font-bold">
-          {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={isRunning ? stopTimer : startTimer}
-            className={`p-2 rounded ${isRunning ? 'bg-red-500' : 'bg-green-500'} text-white`}
+      <section className="wheel-layout" aria-label="Lucky draw">
+        <div className="wheel-main">
+          <div
+            className={`wheel-stage ${spinning ? "is-spinning" : ""} ${phase === "revealed" ? "is-revealed" : ""}`}
           >
-            {isRunning ? <Pause size={20} /> : <Play size={20} />}
-          </button>
-          <button
-            onClick={resetTimer}
-            className="p-2 bg-yellow-500 text-white rounded"
-          >
-            <RotateCcw size={20} />
-          </button>
-        </div>
-      </div>
+            <div className="wheel-stage-top">
+              <span>
+                <i className={spinning ? "spinning-dot" : ""} />
+                {spinning
+                  ? "A little suspense…"
+                  : phase === "revealed"
+                    ? "The wheel has spoken"
+                    : "Let chance take the lead"}
+              </span>
+              <button
+                className="wheel-sound"
+                type="button"
+                onClick={() => {
+                  if (!soundOn) unlock();
+                  setSoundOn((value) => !value);
+                }}
+                aria-label={
+                  soundOn ? "Mute wheel sounds" : "Enable wheel sounds"
+                }
+                aria-pressed={soundOn}
+              >
+                {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                <span>Sound {soundOn ? "on" : "off"}</span>
+              </button>
+            </div>
+            <div
+              className="wheel-stage-decoration wheel-star-one"
+              aria-hidden="true"
+            >
+              ✧
+            </div>
+            <div
+              className="wheel-stage-decoration wheel-star-two"
+              aria-hidden="true"
+            >
+              ✦
+            </div>
+            <div className="wheel-instrument">
+              <WheelDisc
+                entries={displayedEntries}
+                spin={spin}
+                reducedMotion={reducedMotion}
+                onComplete={onComplete}
+                onTick={tick}
+              />
+            </div>
+            {celebrating && !reducedMotion && (
+              <div className="wheel-confetti" aria-hidden="true">
+                {Array.from({ length: 38 }, (_, index) => (
+                  <i
+                    key={index}
+                    style={
+                      {
+                        "--x": `${(index * 29 + 7) % 100}%`,
+                        "--delay": `${(index % 9) * 65}ms`,
+                        "--drift": `${Math.sin(index * 2.4) * 100}px`,
+                        "--turn": `${index * 53}deg`,
+                        background: COLORS[index % COLORS.length],
+                      } as CSSProperties
+                    }
+                  />
+                ))}
+              </div>
+            )}
+            <div className="wheel-stage-bottom">
+              <span>
+                EST. GOOD TIMES <i /> RC / 02
+              </span>
+              <span>
+                {reducedMotion ? "REDUCED MOTION" : "A SPIN WORTH THE WAIT"}
+              </span>
+            </div>
+          </div>
 
-      <div ref={wheelRef} className="relative w-64 h-64">
-        <svg className="w-full h-full" viewBox="0 0 100 100">
-          <g transform={`rotate(${rotation} 50 50)`} style={{ transition: 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)' }}>
-            {availableParticipants.map((participant, index) => (
-              <g key={index}>
-                <path
-                  d={`M50 50 L50 0 A50 50 0 0 1 ${50 + 50 * Math.sin(sliceAngle * Math.PI / 180)} ${50 - 50 * Math.cos(sliceAngle * Math.PI / 180)} Z`}
-                  fill={`hsl(${index * (360 / availableParticipants.length)}, 70%, 80%)`}
-                  transform={`rotate(${index * sliceAngle} 50 50)`}
-                />
-                <text
-                  x="50"
-                  y="15"
-                  textAnchor="middle"
-                  transform={`rotate(${index * sliceAngle + sliceAngle / 2} 50 50)`}
-                  className="text-xs"
-                >
-                  {participant.name}
-                </text>
-              </g>
-            ))}
-          </g>
-          <circle cx="50" cy="50" r="5" fill="gray" />
-          <path d="M50 50 L50 10" stroke="black" strokeWidth="2" />
-        </svg>
-      </div>
-      
-      <div className="flex space-x-2">
-        <button
-          onClick={spinWheel}
-          disabled={spinning || availableParticipants.length === 0}
-          className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-gray-400"
-        >
-          {spinning ? 'Spinning...' : 'Spin the Wheel'}
-        </button>
-        <button
-          onClick={resetSelections}
-          className="px-4 py-2 bg-yellow-500 text-white rounded flex items-center"
-        >
-          <RotateCcw size={16} className="mr-1" /> Reset Selections
-        </button>
-      </div>
-      
-      {selectedParticipant && (
-        <div className="text-xl font-bold mt-4">
-          Selected: {selectedParticipant}
-        </div>
-      )}
-
-      <div className="w-full max-w-md mt-8">
-        <h2 className="text-xl font-bold mb-2">Participants</h2>
-        {participants.map((participant, index) => (
-          <div key={index} className="flex items-center space-x-2 mb-2">
-            <input
-              type="checkbox"
-              checked={participant.present}
-              onChange={() => togglePresence(index)}
-              className="form-checkbox h-5 w-5 text-blue-600"
-            />
-            <span className={participant.selected ? 'line-through' : ''}>
-              {participant.name}
-            </span>
-            <button onClick={() => removeParticipant(index)} className="text-red-500">
-              <Trash2 size={16} />
+          <div className="wheel-command">
+            <div className="wheel-chance">
+              <span className="wheel-eyebrow">
+                {roundComplete ? "ROUND COMPLETE" : "IN THE RUNNING"}
+              </span>
+              <strong>
+                {roundComplete
+                  ? "Everyone had a turn."
+                  : `${available.length} ${available.length === 1 ? "guest" : "guests"} ${phase === "revealed" ? "in the next draw" : "on the wheel"}`}
+                <span>
+                  {available.length > 0
+                    ? `1 in ${available.length} chance`
+                    : presentCount === 0
+                      ? "Add or include a guest to begin"
+                      : "Shall we go again?"}
+                </span>
+              </strong>
+            </div>
+            <button
+              className="wheel-spin-button"
+              type="button"
+              onClick={roundComplete ? newRound : spinWheel}
+              disabled={spinning || (!roundComplete && available.length === 0)}
+            >
+              {spinning ? (
+                <RotateCcw size={17} className="wheel-button-spinner" />
+              ) : roundComplete ? (
+                <RotateCcw size={17} />
+              ) : (
+                <Sparkles size={17} />
+              )}
+              {spinning
+                ? "Spinning…"
+                : roundComplete
+                  ? "Start a new round"
+                  : session.history.length
+                    ? "Spin again"
+                    : "Spin the wheel"}
+              {!spinning && !roundComplete && <ArrowRight size={15} />}
             </button>
           </div>
-        ))}
-        <div className="flex space-x-2 mt-2">
-          <input
-            type="text"
-            value={newParticipant}
-            onChange={(e) => setNewParticipant(e.target.value)}
-            placeholder="New participant"
-            className="form-input px-2 py-1 border rounded"
-          />
-          <button onClick={addParticipant} className="px-2 py-1 bg-blue-500 text-white rounded">
-            Add
-          </button>
+          <div
+            className={`wheel-announcement ${lastDraw && !spinning ? "has-winner" : ""}`}
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span className="wheel-announcement-icon">
+              {lastDraw && !spinning ? (
+                <Sparkles size={20} />
+              ) : (
+                <CircleHelp size={20} />
+              )}
+            </span>
+            <div>
+              <span>
+                {spinning
+                  ? "ROUND AND ROUND WE GO"
+                  : lastDraw
+                    ? phase === "revealed"
+                      ? "A MOMENT IN THE SPOTLIGHT"
+                      : "OUR LAST LUCKY GUEST"
+                    : "YOUR NEXT LUCKY GUEST"}
+              </span>
+              <strong>
+                {spinning ? (
+                  "Who will it be?"
+                ) : lastDraw ? (
+                  <>
+                    {lastDraw.name}
+                    <small>, it’s your turn.</small>
+                  </>
+                ) : (
+                  "The next turn is anyone’s guess."
+                )}
+              </strong>
+            </div>
+            {lastDraw && !spinning && (
+              <span className="winner-draw-number">
+                {session.history.length === 50
+                  ? "LATEST PICK"
+                  : `DRAW ${String(session.history.length).padStart(2, "0")}`}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default SpinningWheel;
+        <aside className="wheel-guests" aria-label="Guest list">
+          <header className="wheel-guests-heading">
+            <div>
+              <p className="wheel-eyebrow">GOOD COMPANY</p>
+              <h2>The guest list.</h2>
+            </div>
+            <span className="guest-total">
+              <Users size={13} />
+              {session.participants.length}
+            </span>
+          </header>
+          <div className="wheel-list-tools">
+            <span>
+              {presentCount} present · {available.length} eligible
+            </span>
+            <button
+              type="button"
+              disabled={spinning || session.participants.length === 0}
+              onClick={() => {
+                clearDisplay();
+                setSession((current) => ({
+                  ...current,
+                  participants: current.participants.map((entry) => ({
+                    ...entry,
+                    present: true,
+                  })),
+                }));
+              }}
+            >
+              Include all
+            </button>
+          </div>
+          <ul className="wheel-guest-list">
+            {session.participants.map((entry, index) => {
+              const drawn = session.noRepeat && entry.selected;
+              return (
+                <li
+                  key={entry.id}
+                  className={`${!entry.present ? "is-absent" : ""} ${drawn ? "is-drawn" : ""}`}
+                >
+                  <label className="guest-presence">
+                    <input
+                      type="checkbox"
+                      checked={entry.present}
+                      disabled={spinning}
+                      onChange={(event) =>
+                        setPresence(entry.id, event.target.checked)
+                      }
+                      aria-label={`Include ${entry.name}`}
+                    />
+                    <span
+                      className="guest-avatar"
+                      style={{ "--guest-color": entry.color } as CSSProperties}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="guest-identity">
+                      <strong title={entry.name}>{entry.name}</strong>
+                      <small>
+                        {!entry.present
+                          ? "Sitting this one out"
+                          : drawn
+                            ? "Already had a turn"
+                            : "Ready for a little luck"}
+                      </small>
+                    </span>
+                  </label>
+                  {drawn && (
+                    <Check
+                      size={13}
+                      className="guest-picked"
+                      aria-label="Picked"
+                    />
+                  )}
+                  <button
+                    className="remove-guest"
+                    type="button"
+                    disabled={spinning}
+                    aria-label={`Remove ${entry.name}`}
+                    onClick={() => {
+                      if (pending.current) return;
+                      clearDisplay();
+                      setSession((current) => ({
+                        ...current,
+                        participants: current.participants.filter(
+                          (candidate) => candidate.id !== entry.id,
+                        ),
+                      }));
+                    }}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {session.participants.length === 0 && (
+            <div className="wheel-empty-guests">
+              <Users size={25} />
+              <p>A little quiet in here.</p>
+              <span>Add your first guest below.</span>
+            </div>
+          )}
+          <form className="wheel-add-guest" onSubmit={addGuest} noValidate>
+            <label className="wheel-sr-only" htmlFor="wheel-guest-name">
+              New guest name
+            </label>
+            <input
+              id="wheel-guest-name"
+              value={name}
+              onChange={(event) => {
+                setName(event.target.value);
+                setFormError("");
+              }}
+              disabled={spinning || session.participants.length >= MAX_ENTRIES}
+              maxLength={40}
+              placeholder={
+                session.participants.length >= MAX_ENTRIES
+                  ? "The guest list is full"
+                  : "Room for one more…"
+              }
+              autoComplete="off"
+              aria-invalid={!!formError}
+              aria-describedby={formError ? "wheel-name-error" : undefined}
+            />
+            <button
+              type="submit"
+              disabled={spinning || session.participants.length >= MAX_ENTRIES}
+              aria-label="Add guest"
+            >
+              <Plus size={17} />
+            </button>
+          </form>
+          {formError && (
+            <p id="wheel-name-error" className="wheel-form-error" role="status">
+              {formError}
+            </p>
+          )}
+          <div className="wheel-rules">
+            <label>
+              <span>
+                <strong>Everyone gets a turn</strong>
+                <small>Keep picked guests out of the next draw.</small>
+              </span>
+              <input
+                type="checkbox"
+                role="switch"
+                checked={session.noRepeat}
+                disabled={spinning}
+                aria-label="No repeat winners"
+                onChange={(event) => {
+                  clearDisplay();
+                  setSession((current) => ({
+                    ...current,
+                    noRepeat: event.target.checked,
+                  }));
+                }}
+              />
+            </label>
+            <div>
+              <span>
+                <Check size={12} />
+                {session.noRepeat
+                  ? "Drawing without repeats"
+                  : "Repeat winners are welcome"}
+              </span>
+              <button
+                type="button"
+                onClick={newRound}
+                disabled={spinning || session.history.length === 0}
+                aria-label="Start a new round"
+              >
+                <RotateCcw size={13} />
+                New round
+              </button>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <div className="wheel-bottom-grid">
+        <TurnTimer drawToken={lastDraw?.id ?? null} />
+        <section className="wheel-history" aria-label="Draw history">
+          <header>
+            <div>
+              <p className="wheel-eyebrow">THE LUCKY ONES</p>
+              <h2>Good things come around.</h2>
+            </div>
+            <History size={19} strokeWidth={1.4} />
+          </header>
+          {session.history.length === 0 ? (
+            <div className="wheel-history-empty">
+              <span>
+                <Sparkles size={22} strokeWidth={1.2} />
+              </span>
+              <strong>A story waiting for its first spin.</strong>
+              <p>Your picks will appear here, one lucky guest at a time.</p>
+            </div>
+          ) : (
+            <ol className="wheel-history-list">
+              {[...session.history].reverse().map((record, index) => (
+                <li key={record.id}>
+                  <span className="history-number">
+                    {String(session.history.length - index).padStart(2, "0")}
+                  </span>
+                  <span
+                    className="history-swatch"
+                    style={{ background: record.color }}
+                  />
+                  <strong title={record.name}>{record.name}</strong>
+                  {index === 0 && (
+                    <span className="history-latest">LATEST PICK</span>
+                  )}
+                  <time dateTime={new Date(record.drawnAt).toISOString()}>
+                    {new Date(record.drawnAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </time>
+                  <ChevronRight size={12} />
+                </li>
+              ))}
+            </ol>
+          )}
+          <div className="wheel-history-footer">
+            <Clock3 size={12} />
+            <span>
+              {session.history.length === 50
+                ? "Latest 50 picks in this round"
+                : session.history.length
+                  ? `${session.history.length} ${session.history.length === 1 ? "pick" : "picks"} this round`
+                  : "Every guest has an equal chance at each draw."}
+            </span>
+          </div>
+        </section>
+      </div>
+      <footer className="wheel-footer">
+        <span>A little chance. A lot of good company.</span>
+        <span>
+          {canSave
+            ? "Guest list & picks saved for this tab."
+            : "Session storage unavailable. Changes are temporary."}{" "}
+          <i /> Timer resets when you leave.
+        </span>
+      </footer>
+    </main>
+  );
+}

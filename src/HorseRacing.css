@@ -1,42 +1,1000 @@
-#root {
-  width: 1280px;
+.race-app {
+  max-width: 1536px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 42px 52px 0;
+}
+.race-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 34px;
+  gap: 20px;
+}
+.eyebrow {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  color: #838976;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.eyebrow > span {
+  width: 5px;
+  height: 5px;
+  background: #a6b18d;
+  border-radius: 50%;
+}
+.race-heading h1 {
+  font:
+    56px/1.2 "DM Serif Display",
+    Georgia,
+    serif;
+  letter-spacing: -1.8px;
+  margin: 8px 0 9px;
+}
+.race-heading h1 em {
+  color: #6e8252;
+  font-weight: 400;
+}
+.race-heading p {
+  font-size: 12px;
+  color: #808478;
+}
+.meeting-badge {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #dce1d4;
+  border-radius: 8px;
+  padding: 18px 24px;
+  background: #f0f2e8;
+  color: #63774d;
+}
+.meeting-badge > span {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+.meeting-badge strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin-top: 5px;
+  color: #485b44;
+}
+.meeting-badge b {
+  padding: 0 6px;
+  font-weight: 400;
+  color: #acb39b;
+}
+.race-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 275px;
+  border: 1px solid #dce1d5;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fffefa;
+  box-shadow: 0 7px 22px #33432e04;
+}
+.race-stage {
+  min-width: 0;
+}
+.scene-wrap {
+  height: 500px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #dcecef;
+}
+.scene-topline {
+  position: absolute;
+  top: 23px;
+  left: 23px;
+  right: 23px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+.venue-label {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 650;
+  gap: 7px;
+}
+.venue-label small {
+  font-size: 8px;
+  letter-spacing: 1px;
+  font-weight: 500;
+  margin-left: 9px;
+  padding: 4px 7px;
+  background: #ffffff50;
+  border: 1px solid #ffffff80;
+  border-radius: 3px;
+  color: #54736d;
+}
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background: #5c8371;
+  border-radius: 50%;
+}
+.live-dot.active {
+  background: #54843e;
+  box-shadow: 0 0 0 4px #54843e20;
+  animation: live 1.7s infinite;
+}
+.weather-label {
+  font-size: 10px;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  color: #5c7878;
+}
+.camera-tools {
+  position: absolute;
+  top: 65px;
+  left: 23px;
+  background: #fdfef2da;
+  border: 1px solid #ffffffc0;
+  display: flex;
+  padding: 4px;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px #29454109;
+  backdrop-filter: blur(10px);
+}
+.camera-tools button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  background: transparent;
+  color: #6c8074;
+  font-size: 10px;
+  border-radius: 3px;
+}
+.camera-tools button.active {
+  background: #345844;
+  color: #fffbed;
+  box-shadow: 0 2px 5px #23402f20;
+}
+.camera-tools button:hover:not(.active) {
+  background: #e5e9da;
+}
+.scene-caption {
+  position: absolute;
+  bottom: 21px;
+  left: 23px;
+  right: 23px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  color: #617b78;
+  pointer-events: none;
+}
+.scene-caption > span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.scene-caption i {
+  height: 1px;
+  width: 20px;
+  background: #8ea69e;
+}
+.scene-caption-right {
+  font-size: 7px;
+  letter-spacing: 1.7px;
+}
+.race-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 86px;
+  padding: 16px 24px;
+  border-top: 1px solid #dbe3d8;
+}
+.race-clock {
+  min-width: 82px;
+}
+.race-clock .eyebrow {
+  font-size: 8px;
+  letter-spacing: 1.2px;
+}
+.race-clock strong {
+  font-size: 23px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.9px;
+}
+.lap-status {
+  flex: 1;
+  padding: 0 10px;
+}
+.lap-status > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 9px;
+  color: #818879;
+  margin-bottom: 8px;
+}
+.lap-status strong {
+  font-size: 9px;
+  font-weight: 500;
+  color: #526d49;
+  font-variant-numeric: tabular-nums;
+}
+.lap-track {
+  height: 4px;
+  background: #e9ecdf;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.lap-track > span {
+  display: block;
+  height: 100%;
+  background: #9cab78;
+  border-radius: 4px;
+}
+.reset-race {
+  display: grid;
+  place-items: center;
+  background: #f0f1e7;
+  color: #5d7150;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #e2e6d7;
+  border-radius: 5px;
+}
+.reset-race:hover {
+  background: #e3e7d6;
+}
+.start-race {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 131px;
+  height: 40px;
+  background: #365740;
+  color: #fffcef;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 2px 3px #1b2d2520;
+}
+.start-race:hover {
+  background: #243e2b;
+}
+.start-race:disabled {
+  opacity: 0.5;
+}
+.standings {
+  border-left: 1px solid #dce1d5;
+  padding: 23px 19px 16px;
+  display: flex;
+  flex-direction: column;
+}
+.standings-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.standings-title .eyebrow {
+  font-size: 8px;
+  letter-spacing: 1.4px;
+  margin-bottom: 4px;
+}
+.standings-title h2 {
+  font:
+    23px "DM Serif Display",
+    Georgia,
+    serif;
+  letter-spacing: -0.5px;
+}
+.runner-count {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 1px solid #e1e5d7;
+  border-radius: 50%;
+  font-size: 10px;
+  color: #6a7e57;
+}
+.standings-columns {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #949b8c;
+  padding: 0 4px 13px;
+  border-bottom: 1px solid #e7e9df;
+}
+.runner-list {
+  list-style: none;
+  margin: 5px 0 12px;
+  padding: 0;
+}
+.runner-row {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 10px;
+  width: 100%;
+  height: 47px;
+  padding: 8px 6px;
+  background: transparent;
+  border-radius: 5px;
+  color: #43533f;
+  border: 1px solid transparent;
+}
+.runner-row:hover {
+  background: #f5f6ec;
+}
+.runner-row.selected {
+  background: #eef2e6;
+  border-color: #e5eadb;
+}
+.rank {
+  font-size: 10px;
+  color: #a1a78f;
+  font-variant-numeric: tabular-nums;
+  width: 15px;
+}
+.rank.first {
+  color: #b28b46;
+}
+.silk {
+  width: 24px;
+  height: 25px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--silk);
+  clip-path: polygon(
+    22% 0,
+    38% 0,
+    41% 11%,
+    59% 11%,
+    62% 0,
+    78% 0,
+    100% 22%,
+    82% 44%,
+    76% 35%,
+    76% 100%,
+    24% 100%,
+    24% 35%,
+    18% 44%,
+    0 22%
+  );
+}
+.silk > span {
+  font-size: 8px;
+  color: white;
+  font-weight: 700;
+  margin-top: 5px;
+}
+.runner-info {
+  flex: 1;
+  min-width: 0;
+}
+.runner-info strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.runner-progress {
+  display: block;
+  height: 2px;
+  background: #e8ebdf;
+  margin-top: 7px;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.runner-progress i {
+  display: block;
+  height: 100%;
+  opacity: 0.65;
+}
+.runner-value {
+  font-size: 9px;
+  min-width: 33px;
+  text-align: right;
+  color: #8e967e;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+.standings-note {
+  margin-top: auto;
+  background: #f4f5ec;
+  border-radius: 5px;
+  padding: 13px 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #829467;
+}
+.standings-note span {
+  font-size: 8px;
+  line-height: 1.6;
+  color: #8b927f;
+}
+.standings-note strong {
+  display: block;
+  font-weight: 500;
+  font-size: 10px;
+  color: #62714f;
+}
+.course-section {
+  margin-top: 30px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  gap: 16px;
+}
+.section-heading h2 {
+  font:
+    24px "DM Serif Display",
+    Georgia,
+    serif;
+  letter-spacing: -0.5px;
+}
+.section-heading > span {
+  font-size: 8px;
+  color: #939987;
+  letter-spacing: 1.2px;
+}
+.course-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.course-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  padding: 12px;
+  background: #fafaf5;
+  border: 1px solid #e0e4d7;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.course-card.chosen {
+  border-color: #718459;
+  background: #f1f3e7;
+  box-shadow: 0 0 0 1px #71845910;
+}
+.course-card:hover:not(:disabled) {
+  background: #ebefdd;
+  transform: translateY(-1px);
+}
+.course-card:disabled:not(.chosen) {
+  opacity: 0.55;
+}
+.course-art {
+  width: 85px;
+  height: 77px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  background: #dbe5c9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  color: #698556;
+}
+.course-art > svg {
+  z-index: 1;
+  transform: translateY(-8px);
+}
+.mini-track {
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  border: 7px solid #b6b787;
+  width: 73px;
+  height: 32px;
+  border-radius: 50%;
+  transform: rotate(-12deg);
+}
+.mini-track:after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1px solid #f5f0d0;
+  border-radius: 50%;
+}
+.course-sunset .course-art {
+  background: #f1d7bc;
+  color: #bc8658;
+}
+.course-sunset .mini-track {
+  border-color: #c6987b;
+}
+.course-alpine .course-art {
+  background: #dce6e4;
+  color: #698980;
+}
+.course-alpine .mini-track {
+  border-color: #99b1a4;
+}
+.course-description {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+.course-tag {
+  font-size: 7px;
+  letter-spacing: 1.3px;
+  color: #929b7e;
+}
+.course-description strong {
+  font:
+    19px "DM Serif Display",
+    Georgia,
+    serif;
+  white-space: nowrap;
+}
+.course-description small {
+  font-size: 9px;
+  color: #909580;
+}
+.course-select {
+  margin-left: auto;
+  color: #8c997b;
+  align-self: flex-start;
+  padding: 1px;
+}
+.chosen .course-select {
+  color: #4e6a3f;
+}
+.race-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0 26px;
+  font-size: 9px;
+  color: #9a9e8e;
+  gap: 15px;
+}
+.footer-separator {
+  padding: 0 10px;
+  color: #c7cbbb;
+}
+.race-footer > a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #728163;
+}
+.race-footer > a:hover {
+  color: #2d543b;
+}
+.race-footer > a > span {
+  font-size: 7px;
+  border: 1px solid #dee4d6;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: #263e350d;
+  pointer-events: none;
+}
+.countdown > span {
+  font:
+    110px "DM Serif Display",
+    Georgia,
+    serif;
+  color: #fffef1;
+  text-shadow: 0 5px 30px #183a3545;
+  animation: count-in 0.7s both;
+}
+.countdown > small {
+  font-size: 9px;
+  letter-spacing: 3px;
+  background: #345844eb;
+  color: #fffcf0;
+  padding: 9px 15px;
+  border-radius: 20px;
+}
+.paused-label {
+  position: absolute;
+  top: 115px;
+  left: 23px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fffcefef;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.scene-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  padding: 40px;
   text-align: center;
+  color: #526e58;
+  background: #e4ece2;
 }
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.scene-message h3 {
+  font:
+    28px "DM Serif Display",
+    Georgia,
+    serif;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.scene-message p {
+  font-size: 12px;
+  max-width: 300px;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.scene-message button {
+  background: #345844;
+  color: white;
+  border-radius: 5px;
+  padding: 9px 16px;
 }
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
+.loading-ring {
+  width: 25px;
+  height: 25px;
+  border: 2px solid #b6c6b0;
+  border-top-color: #466b4e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@keyframes count-in {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
-
-.card {
-  padding: 2em;
+@keyframes live {
+  50% {
+    box-shadow: 0 0 0 5px #54843e08;
+  }
 }
-
-.read-the-docs {
-  color: #888;
+@media (min-width: 1450px) {
+  .scene-wrap {
+    height: 550px;
+  }
+  .runner-row {
+    height: 51px;
+  }
+  .standings {
+    padding: 25px 22px;
+  }
+  .race-layout {
+    grid-template-columns: minmax(0, 1fr) 290px;
+  }
+}
+@media (max-width: 1150px) {
+  .race-app {
+    padding: 32px 28px 0;
+  }
+  .race-layout {
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+  .scene-wrap {
+    height: 460px;
+  }
+  .race-controls {
+    gap: 12px;
+    padding: 16px;
+  }
+  .lap-status {
+    padding: 0;
+  }
+  .lap-status > div:first-child > span {
+    max-width: 125px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .course-card {
+    gap: 11px;
+  }
+  .course-art {
+    width: 65px;
+  }
+  .course-description strong {
+    font-size: 17px;
+  }
+  .course-description small {
+    font-size: 8px;
+  }
+  .weather-label {
+    display: none;
+  }
+  .runner-row {
+    gap: 7px;
+    height: 44px;
+  }
+  .standings {
+    padding: 23px 14px 14px;
+  }
+  .start-race {
+    min-width: 112px;
+  }
+  .scene-caption-right {
+    display: none;
+  }
+}
+@media (max-width: 850px) {
+  .race-heading h1 {
+    font-size: 48px;
+  }
+  .meeting-badge {
+    padding: 14px;
+  }
+  .race-layout {
+    grid-template-columns: 1fr;
+  }
+  .scene-wrap {
+    height: 470px;
+  }
+  .standings {
+    border-left: 0;
+    border-top: 1px solid #dce1d5;
+    padding: 20px;
+  }
+  .standings-title {
+    margin-bottom: 15px;
+  }
+  .standings-columns {
+    display: none;
+  }
+  .runner-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    margin: 0 0 12px;
+  }
+  .runner-row {
+    height: 49px;
+  }
+  .standings-note {
+    padding: 10px 13px;
+  }
+  .standings-note span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .course-art {
+    width: 52px;
+    height: 63px;
+  }
+  .course-card {
+    padding: 9px;
+    gap: 9px;
+  }
+  .course-description strong {
+    font-size: 16px;
+  }
+  .course-tag {
+    font-size: 6px;
+  }
+  .course-description small {
+    display: none;
+  }
+  .course-select {
+    position: absolute;
+    right: 6px;
+    top: 5px;
+  }
+  .course-options {
+    gap: 10px;
+  }
+  .race-heading {
+    margin-bottom: 25px;
+  }
+  .race-controls {
+    height: 82px;
+  }
+  .lap-status > div:first-child > span {
+    max-width: none;
+  }
+}
+@media (max-width: 600px) {
+  .race-app {
+    padding: 27px 18px 0;
+  }
+  .race-heading {
+    display: block;
+  }
+  .race-heading h1 {
+    font-size: 45px;
+  }
+  .race-heading .eyebrow {
+    font-size: 7px;
+    letter-spacing: 1.3px;
+  }
+  .race-heading p {
+    font-size: 10px;
+  }
+  .meeting-badge {
+    display: none;
+  }
+  .scene-wrap {
+    height: 380px;
+  }
+  .scene-topline {
+    left: 15px;
+    right: 15px;
+    top: 17px;
+  }
+  .venue-label {
+    font-size: 11px;
+  }
+  .venue-label small {
+    font-size: 7px;
+  }
+  .camera-tools {
+    left: 15px;
+    top: 51px;
+  }
+  .camera-tools button {
+    font-size: 9px;
+    padding: 6px 8px;
+  }
+  .scene-caption {
+    left: 15px;
+    bottom: 15px;
+    font-size: 8px;
+  }
+  .race-controls {
+    padding: 13px;
+    gap: 10px;
+    height: 77px;
+  }
+  .race-clock {
+    min-width: 64px;
+  }
+  .race-clock strong {
+    font-size: 21px;
+  }
+  .race-clock .eyebrow {
+    font-size: 7px;
+  }
+  .lap-status > div:first-child > span {
+    display: none;
+  }
+  .lap-status > div:first-child {
+    justify-content: flex-end;
+  }
+  .start-race {
+    min-width: 107px;
+    font-size: 10px;
+    gap: 7px;
+  }
+  .reset-race {
+    width: 32px;
+    height: 38px;
+  }
+  .standings {
+    padding: 18px 13px;
+  }
+  .standings-title h2 {
+    font-size: 23px;
+  }
+  .runner-list {
+    column-gap: 9px;
+  }
+  .runner-row {
+    gap: 6px;
+    padding: 7px 4px;
+  }
+  .runner-info strong {
+    font-size: 10px;
+  }
+  .silk {
+    width: 20px;
+    height: 22px;
+  }
+  .runner-value {
+    min-width: 28px;
+    font-size: 8px;
+  }
+  .rank {
+    font-size: 9px;
+    width: 13px;
+  }
+  .standings-note span {
+    display: block;
+  }
+  .section-heading h2 {
+    font-size: 22px;
+  }
+  .section-heading > span {
+    font-size: 6px;
+    max-width: 105px;
+    text-align: right;
+    line-height: 1.6;
+  }
+  .course-options {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+  .course-card {
+    padding: 9px 13px;
+    gap: 15px;
+  }
+  .course-art {
+    width: 69px;
+    height: 55px;
+  }
+  .course-description strong {
+    font-size: 20px;
+  }
+  .course-description small {
+    display: block;
+    font-size: 9px;
+  }
+  .course-tag {
+    font-size: 7px;
+  }
+  .course-description {
+    gap: 2px;
+  }
+  .course-select {
+    position: static;
+    align-self: center;
+  }
+  .race-footer {
+    font-size: 8px;
+    align-items: flex-start;
+    line-height: 1.8;
+  }
+  .race-footer > span {
+    max-width: 185px;
+  }
+  .race-footer > a {
+    white-space: nowrap;
+    font-size: 8px;
+  }
+  .footer-separator {
+    padding: 0 5px;
+  }
+  .paused-label {
+    left: 15px;
+    top: 100px;
+  }
 }

@@ -1,0 +1,291 @@
+.turn-timer {
+  --turn-timer-forest: #294d39;
+  --turn-timer-brass: #a47a40;
+  --turn-timer-ink: #263e35;
+  container-type: inline-size;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  padding: 24px;
+  border: 1px solid #dce1d3;
+  border-top: 3px solid var(--turn-timer-brass);
+  border-radius: 16px;
+  background: #faf9f2;
+  color: var(--turn-timer-ink);
+  box-shadow: 0 5px 20px #263e3508;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.turn-timer,
+.turn-timer * {
+  box-sizing: border-box;
+}
+
+.turn-timer .turn-timer__eyebrow {
+  margin: 0 0 6px;
+  color: #7a6039;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.turn-timer .turn-timer__heading {
+  margin: 0;
+  color: var(--turn-timer-forest);
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.turn-timer__body {
+  display: grid;
+  grid-template-columns: minmax(110px, 144px) minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.turn-timer__dial {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.turn-timer__ring {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke-width: 5;
+}
+
+.turn-timer__track {
+  stroke: #e5e7dc;
+}
+
+.turn-timer__progress {
+  stroke: var(--turn-timer-forest);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 180ms linear;
+}
+
+.turn-timer__dial-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.turn-timer__time {
+  color: var(--turn-timer-forest);
+  font-size: clamp(28px, 8cqi, 37px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+}
+
+.turn-timer__dial-label {
+  color: #67705f;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+}
+
+.turn-timer__controls {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.turn-timer__presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.turn-timer button,
+.turn-timer .turn-timer__minutes {
+  min-width: 0;
+  min-height: 36px;
+  margin: 0;
+  border: 1px solid #d7ddce;
+  border-radius: 7px;
+  background: #fffef9;
+  color: var(--turn-timer-ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.turn-timer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 6px 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    color 150ms;
+}
+
+.turn-timer button:hover {
+  border-color: #9ba98c;
+  background: #edf0e4;
+}
+
+.turn-timer .turn-timer__preset[aria-pressed="true"] {
+  border-color: var(--turn-timer-forest);
+  background: #e8edde;
+  color: var(--turn-timer-forest);
+  font-weight: 700;
+}
+
+.turn-timer button:focus-visible,
+.turn-timer input:focus-visible {
+  outline: 3px solid var(--turn-timer-brass);
+  outline-offset: 3px;
+}
+
+.turn-timer__custom-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #626b5a;
+  font-size: 11px;
+}
+
+.turn-timer__custom-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+}
+
+.turn-timer .turn-timer__minutes {
+  width: 100%;
+  padding: 6px 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+.turn-timer .turn-timer__minutes[aria-invalid="true"] {
+  border-color: #89502f;
+}
+
+.turn-timer .turn-timer__error {
+  margin: 6px 0 0;
+  color: #89502f;
+  font-size: 11px;
+}
+
+.turn-timer__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px;
+  gap: 7px;
+}
+
+.turn-timer .turn-timer__play {
+  border-color: var(--turn-timer-forest);
+  background: var(--turn-timer-forest);
+  color: #fffdf3;
+}
+
+.turn-timer .turn-timer__play:hover {
+  border-color: #1e3b2b;
+  background: #1e3b2b;
+}
+
+.turn-timer .turn-timer__completion {
+  min-height: 21px;
+  margin: 10px 0 8px;
+  color: var(--turn-timer-forest);
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 16px;
+  line-height: 21px;
+  text-align: center;
+}
+
+.turn-timer--complete .turn-timer__track {
+  stroke: var(--turn-timer-brass);
+}
+
+.turn-timer--complete .turn-timer__dial {
+  border-radius: 50%;
+  background: #edf0e4;
+}
+
+.turn-timer__footer {
+  padding-top: 14px;
+  border-top: 1px solid #e0e3d6;
+}
+
+.turn-timer__auto-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.turn-timer .turn-timer__checkbox {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--turn-timer-forest);
+  cursor: pointer;
+}
+
+.turn-timer .turn-timer__helper {
+  margin: 2px 0 0;
+  color: #626b5a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Respond to the allocated card width, not the width of the whole page. */
+@container (max-width: 360px) {
+  .turn-timer__body {
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .turn-timer .turn-timer__heading {
+    font-size: 25px;
+  }
+
+  .turn-timer .turn-timer__preset {
+    padding-inline: 3px;
+  }
+}
+
+@container (max-width: 280px) {
+  .turn-timer__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .turn-timer__dial {
+    width: 130px;
+    justify-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turn-timer *,
+  .turn-timer *::before,
+  .turn-timer *::after {
+    animation: none;
+    transition: none;
+  }
+}

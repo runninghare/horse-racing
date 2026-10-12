@@ -1,70 +1,53 @@
-import { useState } from 'react'
-import HorseRacing from './HorseRacing'
-import SpinningWheel from './SpinningWheel'
+import { lazy, Suspense, useState } from "react";
+import { ArrowUpRight, Flag } from "lucide-react";
+import HorseRacing from "./HorseRacing";
 
-function App() {
-  const [currentGame, setCurrentGame] = useState<'horses' | 'wheel' | null>(null)
+const SpinningWheel = lazy(() => import("./SpinningWheel"));
 
+export default function App() {
+  const [currentGame, setCurrentGame] = useState<"horses" | "wheel">("horses");
   return (
-    <div style={{
-      maxWidth: '1280px',
-      margin: '0 auto',
-      padding: '2rem',
-    }}>
-      {/* Navigation Buttons */}
-      <div style={{
-        display: 'flex',
-        gap: '1rem',
-        marginBottom: '2rem',
-        justifyContent: 'center'
-      }}>
-        <button
-          onClick={() => setCurrentGame('horses')}
-          style={{
-            padding: '0.75rem 1.5rem',
-            backgroundColor: currentGame === 'horses' ? '#3B82F6' : '#E5E7EB',
-            color: currentGame === 'horses' ? 'white' : 'black',
-            border: 'none',
-            borderRadius: '0.5rem',
-            cursor: 'pointer',
-            fontWeight: '500'
+    <>
+      <header className="site-header">
+        <a
+          className="wordmark"
+          href="#"
+          onClick={(event) => {
+            event.preventDefault();
+            setCurrentGame("horses");
           }}
+          aria-label="Racing Club home"
         >
-          Horse Racing
-        </button>
-        <button
-          onClick={() => setCurrentGame('wheel')}
-          style={{
-            padding: '0.75rem 1.5rem',
-            backgroundColor: currentGame === 'wheel' ? '#3B82F6' : '#E5E7EB',
-            color: currentGame === 'wheel' ? 'white' : 'black',
-            border: 'none',
-            borderRadius: '0.5rem',
-            cursor: 'pointer',
-            fontWeight: '500'
-          }}
+          <span className="brand-icon">
+            <Flag size={21} strokeWidth={1.6} />
+          </span>
+          Racing Club<span className="brand-period">.</span>
+        </a>
+        <nav aria-label="Games">
+          <button
+            onClick={() => setCurrentGame("horses")}
+            className={currentGame === "horses" ? "current" : ""}
+          >
+            The racecourse
+          </button>
+          <button
+            onClick={() => setCurrentGame("wheel")}
+            className={currentGame === "wheel" ? "current" : ""}
+          >
+            Spinning wheel <ArrowUpRight size={13} />
+          </button>
+        </nav>
+        <span className="header-note">GOOD COMPANY. GREAT RACING.</span>
+      </header>
+      {currentGame === "horses" ? (
+        <HorseRacing />
+      ) : (
+        <Suspense
+          fallback={<p className="wheel-loading">Polishing the wheel…</p>}
         >
-          Spinning Wheel
-        </button>
-      </div>
-
-      {/* Game Components */}
-      {currentGame === 'horses' && <HorseRacing />}
-      {currentGame === 'wheel' && <SpinningWheel />}
-      
-      {/* Welcome Message */}
-      {currentGame === null && (
-        <div style={{
-          textAlign: 'center',
-          marginTop: '4rem',
-          color: '#4B5563'
-        }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Welcome to Game Center</h1>
-          <p>Please select a game to begin</p>
-        </div>
+          <SpinningWheel />
+        </Suspense>
       )}
-    </div>
-  )
+    </>
+  );
 }
-
-export default App
