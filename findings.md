@@ -1,4 +1,6 @@
 # Findings
+- Race speed scales only simulation time after the countdown; the UI and every horse/dust animation share one playback rate. Sampling and exact finish times are unchanged. Browser measurements match 4×, 0.5× and 2×, including live switching and pause/resume.
+- Responsive speed-control QA initially waited on a 320px viewport and timed out. Inspection confirmed the app's existing `body { min-width: 360px }`; verify supported widths from 360px upward and read computed layout directly after CDP resizing.
 - Wheel enhancement: original SVG uses a rotating pointer, shrinks slices at winner reveal, identifies people by name, and allows roster mutation mid-spin. Replace with a stationary pointer, immutable spin snapshot and stable IDs.
 - Existing wheel timer uses chained interval state; replacement should calculate remaining time from a deadline and clean up all callbacks on unmount.
 - New wheel uses Web Crypto samples, stable participant IDs, frozen visual snapshots, a fixed pointer, and 5.4-second quartic deceleration. Sound is synthesized locally and opt-in.

@@ -1,4 +1,5 @@
 # Progress
+- Race-speed control completed (0.5×, 1×, 1.5×, 2×, 4×), including synchronized gallop/dust and a real-time countdown. All 69 automated cases, lint and build pass. Desktop browser measured 4.00×, 0.50× and 1.99×; pause, live switching, retained speed on reset and full 4× finish work without captured errors. Visually checked desktop and 390px mobile, including 1.5× selection; controls also fit tablet/intermediate widths. Usage, verification and screenshots updated.
 - Started requested wheel enhancement; inspected current wheel, shared shell, styles and working tree. Existing race changes and participant edit will be preserved.
 - Implemented WheelDisc, optional synthesized sound, immutable draw/session helpers, session-storage persistence, new wheel UI and dedicated TurnTimer. Initial build/lint pass; 64 tests pass before extra Date-range validation case.
 - Visually checked desktop wheel and winner, plus 390px mobile. Verified timer completion at 00:00 with Replay, single/empty states, and no runtime errors. Fixed sleep-aware timer deadline after independent correctness audit.

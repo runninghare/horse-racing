@@ -16,7 +16,8 @@ Open the Vite URL (normally `http://localhost:5173`). A WebGL-capable browser is
 ## Play
 
 - Choose **Meadow Park**, **Golden Hour**, or **Alpine Run** before racing. These are themed versions of the same oval course.
-- **Start race** begins a three-second countdown and a roughly 35–43-second lap. Fresh speed profiles are sampled for each race; there are no betting mechanics.
+- **Start race** begins a three-second countdown and a roughly 35–43-second lap at 1× speed. Fresh speed profiles are sampled for each race; there are no betting mechanics.
+- **Speed** selects 0.5×, 1× (default), 1.5×, 2× or 4×, even mid-race. Gallop and dust follow the same rate. The countdown stays three real seconds, and race times/results remain in simulated seconds. Reset and racing again keep your selected speed while on the racecourse.
 - **Pause / Resume** freezes both progress and gallop. Leaving the browser tab automatically pauses the race. **Reset** returns everyone to the start.
 - Select a runner in the standings, then choose **Follow** for a close-up. **Broadcast** frames the whole diorama; **Free orbit** supports drag and zoom.
 - Results use exact crossing times, not render-frame order. Each lane is normalized to a lap so outer lanes do not inherently lose.

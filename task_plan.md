@@ -32,3 +32,9 @@ Wheel completion evidence: inspected `docs/screenshots/wheel-desktop.png` and `w
 - Preserve the user's edited participant list and the spinning-wheel game.
 - Local, reusable model assets; no external asset dependencies.
 - Match finish order to actual race progress; support pause/restart and course selection.
+
+## Race playback speed
+- [x] Add an accessible 0.5×–4× selector with responsive layout and live updates.
+- [x] Scale simulation, gallop and dust together; preserve countdown timing, pause and results.
+- [x] Verify automated tests and desktop/mobile browser behavior; document usage.
+- QA note: a parameterized browser viewport wait timed out; inspected actual dimensions and existing 360px minimum, then switched to direct layout checks at supported widths.

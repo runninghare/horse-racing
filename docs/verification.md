@@ -1,8 +1,17 @@
 # Verification
 
+## Race-speed control
+
+- All **69 automated cases**, production build and lint pass. Four new simulation tests cover countdown carryover, live speed changes/pause, all five rates at 24/60/144 FPS, exact finish ordering and invalid rates.
+- Default speed is 1×. Live browser measurements were 4.00×, 0.50× and 1.99× for the 4×, 0.5× and 2× selections. The countdown still took about three real seconds.
+- Changing speed while paused left the clock at 00:05.9; resuming used the new speed. Reset returned the race to ready at 00:00.0 and retained 2×. A complete 4× race produced eight ordered finish times with no captured runtime errors.
+- Inspected desktop and 390×844 mobile controls; mobile 1.5× selection works with no horizontal overflow. Control bounds also fit at 600, 601, 850, 860 and 1024px layouts.
+- After the alignment adjustment, browser measurements confirm the selector, reset and race buttons share identical top/bottom edges and heights: 40px at 1440, 860 and 601px widths; 44px on 390px mobile.
+- [Speed control desktop](screenshots/race-speed-desktop.png) · [Speed control mobile](screenshots/race-speed-mobile.png)
+
 ## Wheel enhancement
 
-- `npm run build`, `npm run lint`, and the application TypeScript check pass. The combined suite now has **65 passing cases** (including nested malformed-storage cases).
+- `npm run build`, `npm run lint`, and the application TypeScript check passed. At wheel completion the combined suite had **65 passing cases** (including nested malformed-storage cases).
 - Selection tests cover uniform sample grids and fixed-pointer alignment for every roster size from 1 to 24, safe inner-sector landing, immutable stable-ID updates, duplicate-name identity, presence, repeat mode, reset, history bounds, storage validation, and deadline rounding.
 - Browser verified the first draw's pointer sector ID (`seed-7`) matched the recorded winner (Johnathan). All eight sectors stayed visible after reveal while seven guests became eligible for the next spin. Every roster/rule control was disabled during animation.
 - A second no-repeat pick was Amy; neither the first winner nor an excluded Ross was selected. Adding/removing a temporary guest, duplicate-name rejection, and guest exclusion were exercised. Navigation restored both picks and the guest list while resetting the timer.
@@ -20,7 +29,7 @@
 - `npm run build`: passed, including TypeScript project compilation.
 - `npx tsc --noEmit`: passed.
 - `npm run lint`: passed.
-- Race simulation: all 10 cases passed, alongside the wheel cases above in `npm test`. Covers creation, countdown carryover, exact finish ordering, ranking, frame-rate independence, monotonic progress, invalid time steps, pause/reset, empty races, and continuous oval position/heading.
+- Race simulation: all 14 cases passed, alongside the wheel cases above in `npm test`. Covers creation, countdown carryover, playback speeds, exact finish ordering, ranking, frame-rate independence, monotonic progress, invalid time steps/rates, pause/reset, empty races, and continuous oval position/heading.
 - `node blender/verify_glb.mjs`: passed. Three.js loads the 422,360-byte GLB; 81 meshes / 5,402 triangles; exactly one 0.8-second `Gallop` clip with 20 tracks and matching loop endpoints. Export contains no lights, cameras, or preview floor.
 
 ## Browser checks (Ego Chromium)
